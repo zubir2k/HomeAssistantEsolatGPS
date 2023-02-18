@@ -1,0 +1,4 @@
+---
+esolat_gps:
+  module: esolat_gps
+  class: EsolatGPS
