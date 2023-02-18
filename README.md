@@ -30,6 +30,26 @@ esolat_gps:
 
 ![image](https://user-images.githubusercontent.com/1905339/219869327-b7995984-fa9a-44dc-aeef-da2b77143809.png)
 
+## Example Use Case
+- Send prayer time alert via Push Notification whenever the person is not at Home (otherwise, alert via [Adzan Automation](https://github.com/zubir2k/HomeAssistantAdzan))
+- Make a condition that will automatically show the prayer time whenever the person is not at Home
+
+![image](https://user-images.githubusercontent.com/1905339/219870342-7498fddf-0893-4e16-a7a0-9daca6b80e6f.png)
+
+```jinja
+<table align=center width=100%>
+<tr align=center><td>Subuh</td><td>Zohor</td><td>Asar</td><td>Maghrib</td><td>Isyak</td></tr>
+<tr align=center><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td></tr><tr align=center><td>
+
+{%if user == "Zubir" and not is_state("person.zubir", "home")%}{{state_attr("sensor.esolat_zubir", "Subuh")}}
+</td><td>{{state_attr("sensor.esolat_zubir", "Zohor")}}</td><td>{{state_attr("sensor.esolat_zubir", "Asar")}}</td><td>{{state_attr("sensor.esolat_zubir", "Maghrib")}}</td><td>{{state_attr("sensor.esolat_zubir", "Isyak")}}</td><tr><ha-alert alert-type="info">Location: <b>{{states("sensor.esolat_zubir")}}</b></ha-alert></tr>
+
+{%else%}{{state_attr("sensor.solat_subuh", "12hours")}}</td><td>{{state_attr("sensor.solat_zohor", "12hours")}}</td><td>{{state_attr("sensor.solat_asar", "12hours")}}</td><td>{{state_attr("sensor.solat_maghrib", "12hours")}}</td><td>{{state_attr("sensor.solat_isyak", "12hours")}}</td>
+<tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>
+
+{%endif%}</tr></table>
+```
+
 ## Special Thanks
 - [HomeAssistantMalaysia](https://www.facebook.com/groups/homeassistantmalaysia)
 - [Malaysia Prayer Time](https://github.com/MalaysiaPrayerTimes)
