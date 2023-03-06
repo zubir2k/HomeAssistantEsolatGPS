@@ -1,0 +1,60 @@
+# EXAMPLE: This will display entity card (Home or GPS Prayer time) based on person's entity state (home or not_home).
+# Home prayer time is based on https://github.com/zubir2k/HomeAssistantAdzan
+
+type: vertical-stack
+cards:
+  - type: conditional
+    conditions:
+      - entity: person.zubirjamal
+        state_not: home
+    card:
+      type: entities
+      entities:
+        - entity: sensor.esolat_zubirjamal
+          name: Current Location
+        - type: divider
+        - type: attribute
+          entity: sensor.esolat_zubirjamal
+          attribute: Subuh
+          name: Subuh
+        - type: attribute
+          entity: sensor.esolat_zubirjamal
+          attribute: Zohor
+          name: Zohor
+        - type: attribute
+          entity: sensor.esolat_zubirjamal
+          attribute: Asar
+          name: Asar
+        - type: attribute
+          entity: sensor.esolat_zubirjamal
+          attribute: Maghrib
+          name: Maghrib
+        - type: attribute
+          entity: sensor.esolat_zubirjamal
+          attribute: Isyak
+          name: Isyak
+  - type: conditional
+    conditions:
+      - entity: person.zubirjamal
+        state: home
+    card:
+      type: entities
+      entities:
+        - entity: sensor.esolat_zubirjamal
+          name: Current Location
+        - type: divider
+        - entity: sensor.solat_subuh
+          format: time
+          name: Subuh
+        - entity: sensor.solat_zohor
+          format: time
+          name: Zohor
+        - entity: sensor.solat_asar
+          format: time
+          name: Asar
+        - entity: sensor.solat_maghrib
+          format: time
+          name: Maghrib
+        - entity: sensor.solat_isyak
+          format: time
+          name: Isyak
