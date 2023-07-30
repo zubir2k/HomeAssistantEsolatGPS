@@ -6,9 +6,9 @@ This is an AppDaemon application used in Home Assistant that will create a Praye
 The GPS-based prayer time API is provided by **[Malaysia Prayer Time](https://mpt.i906.my/)**.
 
 Prayer time information are made as sensor attributes with the following format:
-- 12 hours (e.g. 6:15 AM)
-- 24 hours (e.g. 06:15:00)
-- Timestamp (e.g. 2023-03-06T06:15:00)
+- 12 hours (e.g. 6:01 AM)
+- 24 hours (e.g. 06:01:00)
+- Datetime UTC (e.g. 2023-07-29T22:01:00+00:00)
 
 ## Requirements
 - Home Assistant 2021.x and above
@@ -68,11 +68,11 @@ esolat_gps:
 
 <tr align=center><td>
 {%if user == "Zubir" and not is_state("person.zubir", "home")%}
-  {{state_attr("sensor.esolat_zubir", "Subuh")}}</td>
-  <td>{{state_attr("sensor.esolat_zubir", "Zohor")}}</td>
-  <td>{{state_attr("sensor.esolat_zubir", "Asar")}}</td>
-  <td>{{state_attr("sensor.esolat_zubir", "Maghrib")}}</td>
-  <td>{{state_attr("sensor.esolat_zubir", "Isyak")}}</td>
+  {{state_attr("sensor.esolat_zubir", "Subuh_12h")}}</td>
+  <td>{{state_attr("sensor.esolat_zubir", "Zohor_12h")}}</td>
+  <td>{{state_attr("sensor.esolat_zubir", "Asar_12h")}}</td>
+  <td>{{state_attr("sensor.esolat_zubir", "Maghrib_12h")}}</td>
+  <td>{{state_attr("sensor.esolat_zubir", "Isyak_12h")}}</td>
   <tr><ha-alert alert-type="info">Location: <b>{{states("sensor.esolat_zubir")}}</b></ha-alert></tr>
 
 {%else%}{{state_attr("sensor.solat_subuh", "12hours")}}</td>
@@ -89,7 +89,6 @@ esolat_gps:
 ## Special Thanks
 - [HomeAssistantMalaysia](https://www.facebook.com/groups/homeassistantmalaysia)
 - Saudara [Noorzaini Ilhami](https://github.com/i906) for his [MPT API](https://github.com/MalaysiaPrayerTimes)
-- ChatGPT by [OpenAI](https://chat.openai.com/chat)
 - Prayer times data by [JAKIM](https://www.e-solat.gov.my/). Geolocation data by [Google](https://www.google.com.my)
 
 *You may also try [Adzan Automation](https://github.com/zubir2k/HomeAssistantAdzan)*
