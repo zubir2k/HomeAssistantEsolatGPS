@@ -15,3 +15,13 @@ Prayer time information are made as sensor attributes with the following format:
 - [AppDaemon](https://github.com/hassio-addons/addon-appdaemon) Add-On installed 
 - Device tracker with GPS coordinates assigned to person entity \
 (usually from companion app)
+
+## Installation
+1. Download and copy `esolat_gps` to your AppDaemon folder `/config/appdaemon/apps/`.
+2. Add below line in `apps.yaml` located in the AppDaemon folder.
+3. Done. You will start seeing new sensors that start with `sensor.esolat_`
+```yaml
+esolat_gps:
+  module: esolat_gps
+  class: EsolatGPS
+```
