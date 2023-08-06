@@ -1,4 +1,4 @@
-![esolatgps_banner](https://user-images.githubusercontent.com/1905339/223016758-1c0c8058-7375-43d9-bd65-9fc00f48809c.png)\
+# Home Assistant eSolat GPS
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://zbrj.ml/buymecoffee)
 
