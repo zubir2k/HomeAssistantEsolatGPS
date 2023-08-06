@@ -1,6 +1,6 @@
 # Home Assistant eSolat GPS
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://zbrj.ml/buymecoffee)
+[![Donate](https://img.shields.io/badge/donate-Coffee-yellow.svg)](https://zubirco.de/buymecoffee)
 
 This is an AppDaemon application used in Home Assistant that will create a Prayer Time sensor based on Person's GPS coordinates.
 The GPS-based prayer time API is provided by **[Malaysia Prayer Time](https://mpt.i906.my/)**.
