@@ -44,7 +44,6 @@ class EsolatGPS(hass.Hass):
 
     def update_prayer_time(self, sensor_entity_id, sensor_unique_id, sensor_friendly_name, sensor_icon, latitude, longitude, prayer_entity_id):
         response = requests.get(self.url + f"{latitude},{longitude}")
-        self.log(f"API Response (Code:{response.status_code}) for {sensor_friendly_name}")
         if response.status_code == 404:
             # Set the sensor state to "Outside Malaysia" if the API response has a 404 status code and obtain location as attribute
             geo = requests.get(self.geo + f"lat={latitude}&lon={longitude}")
@@ -52,8 +51,8 @@ class EsolatGPS(hass.Hass):
             geostate = geodata["state"]
             geocountry = geodata["country_code"].upper()
             self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state="Outside Malaysia", attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "location": f"{geostate}, {geocountry}", "gps": f"{latitude},{longitude}"})
-            self.log(f"*** Sensors updated for {sensor_friendly_name} (Outside Malaysia)")
-        else:
+            #self.log(f"*** Sensors updated for {sensor_friendly_name} (Outside Malaysia)")
+        elif response.status_code == 200:
             data = response.json()["data"]
             prayer_times = {}
             for i, prayer_name in enumerate(["Subuh", "Syuruk", "Zohor", "Asar", "Maghrib", "Isyak"]):
@@ -63,7 +62,10 @@ class EsolatGPS(hass.Hass):
                 prayer_times[(f"{prayer_name}_12h").lower()] = self.convert_to_local_12time(prayer_time)
                 prayer_times[(f"{prayer_name}_24h").lower()] = self.convert_to_local_24time(prayer_time)
             self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=data["place"], attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "gps": f"{latitude},{longitude}", **prayer_times})
-            self.log(f"*** Sensors updated for {sensor_friendly_name} ({data['place']})")
+            #self.log(f"*** Sensors updated for {sensor_friendly_name} ({data['place']})")
+        else:
+            self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=f"unavailable", attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "location": f"ERROR CODE:{response.status_code}", "gps": f"{latitude},{longitude}"})
+            self.log(f"API Response for {sensor_friendly_name} -- {response.json()}")
             
     def convert_to_local_12time(self, time):
         return self.timestamp_to_utc(time).strftime("%-I:%M %p")
