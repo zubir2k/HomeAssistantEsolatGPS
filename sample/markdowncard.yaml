@@ -1,4 +1,35 @@
-<table align=center width=100%><tr align=center><td>Subuh</td><td>Zohor</td><td>Asar</td><td>Maghrib</td><td>Isyak</td></tr><tr align=center><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td></tr><tr align=center><td>{%if not is_state('person.' ~ user.lower(), 'home') %}{{ state_attr('sensor.esolat_' ~ user.lower(), 'subuh_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ user.lower(), 'zohor_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ user.lower(), 'asar_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ user.lower(), 'maghrib_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ user.lower(), 'isyak_12h') }}</td><tr><ha-alert alert-type="info">Location: <b>{{ states('sensor.esolat_' ~ user.lower()) }}</b></ha-alert></tr>{%else%}
-{{state_attr("sensor.esolat_home", "subuh_12h")}}</td><td>{{state_attr("sensor.esolat_home", "zohor_12h")}}</td><td>{{state_attr("sensor.esolat_home", "asar_12h")}}</td><td>{{state_attr("sensor.esolat_home", "maghrib_12h")}}</td><td>{{state_attr("sensor.esolat_home", "isyak_12h")}}</td>
+<table align=center width=100%>
+<tr align=center>
+<td>Subuh</td>
+<td>Zohor</td>
+<td>Asar</td>
+<td>Maghrib</td>
+<td>Isyak</td>
+</tr>
+<tr align=center>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+</tr>
+<tr align=center>
+{% for person in states.person | selectattr('name','eq',user) %}
+{% set userid = person.entity_id | replace("person.","") %}
+{% if states('sensor.esolat_' ~ userid) == 'unknown' or states(person.entity_id) == 'home' %}
+<td>{{ state_attr('sensor.esolat_home','subuh_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','zohor_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','asar_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','maghrib_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','isyak_12h') }}</td>
 <tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>
-{%endif%}</tr></table>
+{% else %}
+<td>{{ state_attr('sensor.esolat_' ~ userid,'subuh_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'zohor_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'asar_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'maghrib_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'isyak_12h') }}</td>
+<tr><ha-alert alert-type="info">Location: <b>{{ states('sensor.esolat_' ~ userid) }}</b></ha-alert></tr>
+{% endif %}{% endfor %}
+</tr>
+</table>
