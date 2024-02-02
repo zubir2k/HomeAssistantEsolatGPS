@@ -45,12 +45,11 @@ class EsolatGPS(hass.Hass):
 
     def update_prayer_time(self, sensor_entity_id, sensor_unique_id, sensor_friendly_name, sensor_icon, latitude, longitude, prayer_entity_id):
         today = datetime.now(timezone.utc).date()
-        yesterday = today - timedelta(days=1)
         # Check if today is the first day of the month
         if today.day == 1:
             day_index = 0
         else:
-            day_index = yesterday.day - 1
+            day_index = today.day - 1
         response = requests.get(self.url + f"{latitude},{longitude}")
         if response.status_code == 404:
             # Set the sensor state to "Outside Malaysia" if the API response has a 404 status code and obtain location as attribute
@@ -68,8 +67,6 @@ class EsolatGPS(hass.Hass):
                 prayer_times = {}            
             
                 for i, prayer_name in enumerate(["Subuh", "Syuruk", "Zohor", "Asar", "Maghrib", "Isyak"]):
-                    #yesterday = datetime.now(timezone.utc).date() - timedelta(days=1)
-                    #prayer_time = data["times"][yesterday.day][i]
                     prayer_time = prayer_times_data[i]
                     prayer_times[prayer_name.lower()] = self.timestamp_to_utc(prayer_time).astimezone(pytz.utc).isoformat()
                     prayer_times[(f"{prayer_name}_12h").lower()] = self.convert_to_local_12time(prayer_time)
@@ -77,7 +74,7 @@ class EsolatGPS(hass.Hass):
                 self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=data["place"], attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "gps": f"{latitude},{longitude}", **prayer_times})
                 #self.log(f"*** Sensors updated for {sensor_friendly_name} ({data['place']})")
             except IndexError:
-                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {yesterday}. Index out of range.")
+                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {day_index}. Index out of range.")
                 # Handle the error or set a default state
         else:
             self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=f"unavailable", attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "location": f"ERROR CODE:{response.status_code}", "gps": f"{latitude},{longitude}"})
