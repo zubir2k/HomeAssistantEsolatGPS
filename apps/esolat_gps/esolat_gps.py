@@ -1,6 +1,6 @@
 # Malaysia Prayer Time based on GPS Location using AppDaemon
-# Creation date: 18/02/2023; Modified date: 01/02/2024
-# Major Changes: Added logger and restructure repository to HACS standard.
+# Creation date: 18/02/2023; Modified date: 06/02/2024
+# Major Changes: Added 3 new attributes: Imsak, Isyraq and Dhuha.
 # Fixes: Handling on indexing for 1st of the month.
 
 import appdaemon.plugins.hass.hassapi as hass
@@ -64,17 +64,42 @@ class EsolatGPS(hass.Hass):
             try:
                 # Access the prayer time using 'day_index'
                 prayer_times_data = data["times"][day_index]
-                prayer_times = {}            
-            
+                prayer_times = {}
+
                 for i, prayer_name in enumerate(["Subuh", "Syuruk", "Zohor", "Asar", "Maghrib", "Isyak"]):
                     prayer_time = prayer_times_data[i]
-                    prayer_times[prayer_name.lower()] = self.timestamp_to_utc(prayer_time).astimezone(pytz.utc).isoformat()
+                    utc_prayer_time = self.timestamp_to_utc(prayer_time).astimezone(pytz.utc)
+                    prayer_times[prayer_name.lower()] = utc_prayer_time.isoformat()
                     prayer_times[(f"{prayer_name}_12h").lower()] = self.convert_to_local_12time(prayer_time)
                     prayer_times[(f"{prayer_name}_24h").lower()] = self.convert_to_local_24time(prayer_time)
+                    
+                    # Calculate Imsak, Isyraq, and Dhuha times
+                    if prayer_name.lower() == "subuh":
+                        imsak_time = utc_prayer_time - timedelta(minutes=10)
+                        imsak_12h = self.convert_to_local_12time(imsak_time.timestamp())
+                        imsak_24h = self.convert_to_local_24time(imsak_time.timestamp())
+                        prayer_times["imsak"] = imsak_time.isoformat()
+                        prayer_times["imsak_12h"] = imsak_12h
+                        prayer_times["imsak_24h"] = imsak_24h
+                    if prayer_name.lower() == "syuruk":
+                        # Reference on Isyraq - https://zbrj.ml/waktuisyraq
+                        isyraq_time = utc_prayer_time + timedelta(minutes=12) 
+                        dhuha_time = utc_prayer_time + timedelta(minutes=15)
+                        isyraq_12h = self.convert_to_local_12time(imsak_time.timestamp())
+                        isyraq_24h = self.convert_to_local_24time(imsak_time.timestamp())
+                        dhuha_12h = self.convert_to_local_12time(imsak_time.timestamp())
+                        dhuha_24h = self.convert_to_local_24time(imsak_time.timestamp())
+                        prayer_times["isyraq"] = isyraq_time.isoformat()
+                        prayer_times["isyraq_12h"] = isyraq_12h
+                        prayer_times["isyraq_24h"] = isyraq_24h
+                        prayer_times["dhuha"] = dhuha_time.isoformat()
+                        prayer_times["dhuha_12h"] = dhuha_12h
+                        prayer_times["dhuha_24h"] = dhuha_24h
+                    
                 self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=data["place"], attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "gps": f"{latitude},{longitude}", **prayer_times})
                 #self.log(f"*** Sensors updated for {sensor_friendly_name} ({data['place']})")
             except IndexError:
-                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {day_index}. Index out of range.")
+                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {yesterday}. Index out of range.")
                 # Handle the error or set a default state
         else:
             self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=f"unavailable", attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "location": f"ERROR CODE:{response.status_code}", "gps": f"{latitude},{longitude}"})
