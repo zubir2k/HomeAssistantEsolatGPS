@@ -1,0 +1,60 @@
+> Today is</b><br /><font size=7>{{ now().strftime('%I:%M %p') }}<br />{{ now().strftime('%A') }}</font><br /><font size=2>{{ now().strftime('%d %B %Y') }} | {{states('sensor.hijridate')}}</font>
+
+{% set esolat = namespace(state_attr('sensor.esolatnow','array')) %}
+{% for person in states.person | selectattr('name','eq',user) %}
+{% set userid = person.entity_id | replace('person.','') | replace(' ','_') %}
+{% if states('sensor.esolat_' ~ userid) == 'unknown' or person.state == 'home' %}
+<ha-alert><b>Waktu Sekarang: </b>{{ states('sensor.waktu_sekarang') }} - {{ state_attr('sensor.waktu_sekarang', '12hours') }}<br /><b>Waktu Berikutnya:</b> {{ state_attr('sensor.waktu_sekarang', 'next') }} <br/><font size=1>Tempoh waktu berikutnya - {{ state_attr('sensor.waktu_sekarang', 'nextremaining') }} </font></ha-alert>
+
+<table align=center width=100%>
+<tr align=center>
+<td>Subuh</td>
+<td>Zohor</td>
+<td>Asar</td>
+<td>Maghrib</td>
+<td>Isyak</td>
+</tr>
+<tr align=center>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+</tr>
+<tr align=center>
+<td>{{ state_attr('sensor.solat_subuh','12hours') }}</td>
+<td>{{ state_attr('sensor.solat_zohor','12hours') }}</td>
+<td>{{ state_attr('sensor.solat_asar','12hours') }}</td>
+<td>{{ state_attr('sensor.solat_maghrib','12hours') }}</td>
+<td>{{ state_attr('sensor.solat_isyak','12hours') }}</td>
+<tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>
+
+{% else %}
+<ha-alert alert-type="info"><b>Waktu Sekarang: </b>{{ esolat[userid].waktusekarang }} - {{ as_timestamp(esolat[userid].timestamp) | timestamp_custom('%I:%M %p') }}<br/><b>Waktu Berikutnya: </b>{{ esolat[userid].waktuberikut }}</ha-alert>
+
+<table align=center width=100%>
+<tr align=center>
+<td>Subuh</td>
+<td>Zohor</td>
+<td>Asar</td>
+<td>Maghrib</td>
+<td>Isyak</td>
+</tr>
+<tr align=center>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+<td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
+</tr>
+<tr align=center>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'subuh_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'zohor_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'asar_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'maghrib_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_' ~ userid,'isyak_12h') }}</td>
+<tr><ha-alert alert-type="info"><b>Location: </b>{{ states('sensor.esolat_' ~ userid) }}</ha-alert></tr>
+{% endif %}
+{% endfor %}
+</tr>
+</table>
