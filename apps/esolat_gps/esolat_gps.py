@@ -85,10 +85,10 @@ class EsolatGPS(hass.Hass):
                         # Reference on Isyraq - https://zbrj.ml/waktuisyraq
                         isyraq_time = utc_prayer_time + timedelta(minutes=12) 
                         dhuha_time = utc_prayer_time + timedelta(minutes=15)
-                        isyraq_12h = self.convert_to_local_12time(imsak_time.timestamp())
-                        isyraq_24h = self.convert_to_local_24time(imsak_time.timestamp())
-                        dhuha_12h = self.convert_to_local_12time(imsak_time.timestamp())
-                        dhuha_24h = self.convert_to_local_24time(imsak_time.timestamp())
+                        isyraq_12h = self.convert_to_local_12time(iysraq_time.timestamp())
+                        isyraq_24h = self.convert_to_local_24time(iysraq_time.timestamp())
+                        dhuha_12h = self.convert_to_local_12time(dhuha_time.timestamp())
+                        dhuha_24h = self.convert_to_local_24time(dhuha_time.timestamp())
                         prayer_times["isyraq"] = isyraq_time.isoformat()
                         prayer_times["isyraq_12h"] = isyraq_12h
                         prayer_times["isyraq_24h"] = isyraq_24h
