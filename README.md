@@ -50,54 +50,7 @@ If `user` doesnt have gps location, it will show Home prayer time instead:
 
 ![image](https://user-images.githubusercontent.com/1905339/219870342-7498fddf-0893-4e16-a7a0-9daca6b80e6f.png)
 
-```jinja
-{% set userid = user.lower().replace(' ', '_') %}
-<table align=center width=100%>
-  <tr align=center>
-    <td>Subuh</td>
-    <td>Zohor</td>
-    <td>Asar</td>
-    <td>Maghrib</td>
-    <td>Isyak</td>
-  </tr>
-  <tr align=center>
-    <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
-    <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
-    <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
-    <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
-    <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
-  </tr>
-  <tr align=center><td>
-  {%if not is_state('person.' ~ userid, 'home') and not is_state('person.' ~ userid, 'unknown') %}
-    {{ state_attr('sensor.esolat_' ~ userid, 'subuh_12h') }}</td>
-    <td>{{ state_attr('sensor.esolat_' ~ userid, 'zohor_12h') }}</td>
-    <td>{{ state_attr('sensor.esolat_' ~ userid, 'asar_12h') }}</td>
-    <td>{{ state_attr('sensor.esolat_' ~ userid, 'maghrib_12h') }}</td>
-    <td>{{ state_attr('sensor.esolat_' ~ userid, 'isyak_12h') }}</td>
-      <tr><ha-alert alert-type="info">Location: <b>{{ states('sensor.esolat_' ~ userid) }}</b></ha-alert></tr>
-  {%else%}
-    {{ state_attr('sensor.esolat_home', 'subuh_12h')}}</td>
-    <td>{{state_attr('sensor.esolat_home', 'zohor_12h')}}</td>
-    <td>{{state_attr('sensor.esolat_home', 'asar_12h')}}</td>
-    <td>{{state_attr('sensor.esolat_home', 'maghrib_12h')}}</td>
-    <td>{{state_attr('sensor.esolat_home', 'isyak_12h')}}</td>
-      <tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>
-  {%endif%}</tr>
-</table>
-```
-
-Incase if the code above didn't work, it probably happened because of the indentation not supported in markdown card. Copy/Paste below code instead:
-```jinja
-{% set userid = user.lower().replace(' ', '_') %}
-<table align=center width=100%><tr align=center><td>Subuh</td><td>Zohor</td><td>Asar</td><td>Maghrib</td><td>Isyak</td></tr>
-<tr align=center><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td><td><ha-icon icon="mdi:star-crescent"></ha-icon></td></tr><tr align=center><td>
-{%if not is_state('person.' ~ userid, 'home') and not is_state('person.' ~ userid, 'unknown') %}{{ state_attr('sensor.esolat_' ~ userid, 'subuh_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ userid, 'zohor_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ userid, 'asar_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ userid, 'maghrib_12h') }}</td><td>{{ state_attr('sensor.esolat_' ~ userid, 'isyak_12h') }}</td>
-<tr><ha-alert alert-type="info">Location: <b>{{ states('sensor.esolat_' ~ userid) }}</b></ha-alert></tr>
-{%else%}{{ state_attr('sensor.esolat_home', 'subuh_12h')}}</td><td>{{state_attr('sensor.esolat_home', 'zohor_12h')}}</td><td>{{state_attr('sensor.esolat_home', 'asar_12h')}}</td><td>{{state_attr('sensor.esolat_home', 'maghrib_12h')}}</td><td>{{state_attr('sensor.esolat_home', 'isyak_12h')}}</td>
-<tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>{%endif%}</tr>
-</table>
-
-```
+Look into the sample folder for instructions.
 
 ## Special Thanks
 - [HomeAssistantMalaysia](https://www.facebook.com/groups/homeassistantmalaysia)
