@@ -1,0 +1,77 @@
+## This template will create a new sensor that will calculate current prayer time for all available esolat sensors.
+## This template is required in order for the new markdown card to work. (https://github.com/zubir2k/HomeAssistantEsolatGPS/blob/main/sample/markdowncard_new.yaml)
+## Place this file into config/HAMY and add the following line in your configuration.yaml
+## homeassistant:
+##   package: !include_dir_named HAMY/
+
+template:
+  - sensor:
+      - name: "eSolatNow"
+        icon: mdi:star-crescent
+        unique_id: esolatnow
+        state: >-
+          {{ states.sensor | selectattr('entity_id', 'search', 'sensor.esolat_') | list | count }}
+        attributes:
+          hijri: "{{ states('sensor.esolatnow_hijri') }}"
+          array: >-
+            {% for state in states.sensor | selectattr('entity_id', 'search', 'sensor.esolat_') -%}
+            {% if as_local(now()) >= as_local(state.attributes.imsak | as_datetime) and as_local(now()) <= as_local(state.attributes.subuh | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Imsak' %}{% set waktuberikut = 'Subuh' %}
+            {% elif as_local(now()) >= as_local(state.attributes.subuh | as_datetime) and as_local(now()) <= as_local(state.attributes.syuruk | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Subuh' %}{% set waktuberikut = 'Syuruk' %}
+            {% elif as_local(now()) >= as_local(state.attributes.syuruk | as_datetime) and as_local(now()) <= as_local(state.attributes.isyraq | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Syuruk' %}{% set waktuberikut = 'Isyraq' %}
+            {% elif as_local(now()) >= as_local(state.attributes.isyraq | as_datetime) and as_local(now()) <= as_local(state.attributes.dhuha | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Isyraq' %}{% set waktuberikut = 'Dhuha' %}
+            {% elif as_local(now()) >= as_local(state.attributes.dhuha | as_datetime) and as_local(now()) <= as_local(state.attributes.zohor | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Dhuha' %}{% set waktuberikut = 'Zohor' %}
+            {% elif as_local(now()) >= as_local(state.attributes.zohor | as_datetime) and as_local(now()) <= as_local(state.attributes.asar | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Zohor' %}{% set waktuberikut = 'Asar' %}
+            {% elif as_local(now()) >= as_local(state.attributes.asar | as_datetime) and as_local(now()) <= as_local(state.attributes.maghrib | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Asar' %}{% set waktuberikut = 'Maghrib' %}
+            {% elif as_local(now()) >= as_local(state.attributes.maghrib | as_datetime) and as_local(now()) <= as_local(state.attributes.isyak | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Maghrib' %}{% set waktuberikut = 'Isyak' %}
+            {% elif as_local(now()) >= as_local(state.attributes.isyak | as_datetime) and as_local(now()) <= as_local(state.attributes.imsak | as_datetime) + timedelta(days=1, seconds=-1) %}{% set waktusekarang = 'Isyak' %}{% set waktuberikut = 'Imsak' %}
+            {% elif as_local(now()) >= as_local(state.attributes.isyak | as_datetime) + timedelta(days=-1) and as_local(now()) <= as_local(state.attributes.imsak | as_datetime) + timedelta(seconds=-1) %}{% set waktusekarang = 'Isyak' %}{% set waktuberikut = 'Imsak' %}
+            {% endif %}
+            {%- if loop.first %}{ 
+            "{{ state.attributes.source | replace('person.','') }}":{
+            "waktusekarang":"{{ waktusekarang }}",
+            "waktuberikut":"{{ waktuberikut }}",
+            "timestamp":"{{ state.attributes[(waktusekarang | lower)] }}",
+            "location":"{{ state.state }}"
+            },
+            {%- elif loop.last %}
+            "{{ state.attributes.source | replace('person.','') }}":{
+            "waktusekarang":"{{ waktusekarang }}",
+            "waktuberikut":"{{ waktuberikut }}",
+            "timestamp":"{{ state.attributes[(waktusekarang | lower)] }}",
+            "location":"{{ state.state }}"
+            }
+            }
+            {% else -%}
+            "{{ state.attributes.source | replace('person.','') }}":{
+            "waktusekarang":"{{ waktusekarang }}",
+            "waktuberikut":"{{ waktuberikut }}",
+            "timestamp":"{{ state.attributes[(waktusekarang | lower)] }}",
+            "location":"{{ state.state }}"
+            },{% endif %}
+            {%- endfor %}
+
+sensor:
+  - platform: rest
+    name: "eSolatNow HijriAPI"
+    resource_template: "http://api.aladhan.com/v1/gToH?adjustment=-1&date={{ now().strftime('%d-%m-%Y') }}"
+    value_template: "OK"
+    json_attributes_path: "$.data.hijri"
+    json_attributes:
+      - date
+      - day
+      - month
+      - year
+      - holiday
+
+  - platform: template
+    sensors:
+      esolatnow_hijri:
+        friendly_name: "eSolatNow Hijri"
+        icon_template: mdi:calendar
+        value_template: >-
+          {% set months = ["Muharram", "Safar", "Rabi\'ul Awwal", "Rabi\'ul Akhir", "Jamadil Awwal", "Jamadil Akhir", "Rejab", "Sha\'aban", "Ramadhan", "Syawal", "Zulkaedah", "Zulhijjah"] %}
+          {{ state_attr('sensor.esolatnow_hijriapi', 'day') }} {{ months[state_attr('sensor.esolatnow_hijriapi', 'month')['number'] - 1] }} {{ state_attr('sensor.esolatnow_hijriapi', 'year') }}h
+        attribute_templates:
+          date: "{{ state_attr('sensor.esolatnow_hijriapi', 'date') }}"
+          holidays: "{{ state_attr('sensor.esolatnow_hijriapi', 'holidays') }}"
+    
