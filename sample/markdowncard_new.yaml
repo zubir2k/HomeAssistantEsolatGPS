@@ -1,10 +1,10 @@
-> Today is</b><br /><font size=7>{{ now().strftime('%I:%M %p') }}<br />{{ now().strftime('%A') }}</font><br /><font size=2>{{ now().strftime('%d %B %Y') }} | {{states('sensor.hijridate')}}</font>
+> Today is</b><br /><font size=7>{{ now().strftime('%I:%M %p') }}<br />{{ now().strftime('%A') }}</font><br /><font size=2>{{ now().strftime('%d %B %Y') }} | {{states('sensor.esolatnow_hijri')}}</font>
 
 {% set esolat = namespace(state_attr('sensor.esolatnow','array')) %}
 {% for person in states.person | selectattr('name','eq',user) %}
 {% set userid = person.entity_id | replace('person.','') | replace(' ','_') %}
 {% if states('sensor.esolat_' ~ userid) == 'unknown' or person.state == 'home' %}
-<ha-alert><b>Waktu Sekarang: </b>{{ states('sensor.waktu_sekarang') }} - {{ state_attr('sensor.waktu_sekarang', '12hours') }}<br /><b>Waktu Berikutnya:</b> {{ state_attr('sensor.waktu_sekarang', 'next') }} <br/><font size=1>Tempoh waktu berikutnya - {{ state_attr('sensor.waktu_sekarang', 'nextremaining') }} </font></ha-alert>
+<ha-alert><b>Waktu Sekarang: </b>{{ state_attr('sensor.esolatnow','array')['zone.home'].waktusekarang }} - {{ state_attr('sensor.waktu_sekarang', '12hours') }}<br /><b>Waktu Berikutnya:</b> {{ state_attr('sensor.waktu_sekarang', 'next') }} </ha-alert>
 
 <table align=center width=100%>
 <tr align=center>
@@ -22,11 +22,11 @@
 <td><ha-icon icon="mdi:star-crescent"></ha-icon></td>
 </tr>
 <tr align=center>
-<td>{{ state_attr('sensor.solat_subuh','12hours') }}</td>
-<td>{{ state_attr('sensor.solat_zohor','12hours') }}</td>
-<td>{{ state_attr('sensor.solat_asar','12hours') }}</td>
-<td>{{ state_attr('sensor.solat_maghrib','12hours') }}</td>
-<td>{{ state_attr('sensor.solat_isyak','12hours') }}</td>
+<td>{{ state_attr('sensor.esolat_home','subuh_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','zohor_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','asar_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','maghrib_12h') }}</td>
+<td>{{ state_attr('sensor.esolat_home','isyak_12h') }}</td>
 <tr><ha-alert alert-type="info">Location: <b>Home</b> 🏠</ha-alert></tr>
 
 {% else %}
