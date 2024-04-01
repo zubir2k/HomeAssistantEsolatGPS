@@ -17,9 +17,19 @@ Prayer time information are made as sensor attributes with the following format:
 - Device tracker with GPS coordinates assigned to person entity \
 (usually from companion app)
 
+## IMPORTANT
+- Since AppDaemon [v0.15.0](https://github.com/hassio-addons/addon-appdaemon/releases/tag/v0.15.0), the location for the addon has been moved out from `/config/appdaemon`. It is now stored in a dedicated `addon_config` folder outside of the `/config` path.
+- To continue using the current path `/config/appdaemon`, you need to define the app_dir in your `appdaemon.yaml` file located in the `addon_config`
+
+```yaml
+secrets: /homeassistant/secrets.yaml
+appdaemon:
+  app_dir: /homeassistant/appdaemon/apps
+```
+
 ## Installation
-1. Download and it will install into your AppDaemon folder `/config/appdaemon/apps/`.
-2. Add below line in `apps.yaml` located in the AppDaemon folder.
+1. Download and it will install into your AppDaemon App folder `/homeassistant/appdaemon/apps/`.
+2. Add below line in `apps.yaml` located in the AppDaemon App folder.
 3. Done. You will start seeing new sensors that start with `sensor.esolat_`
 
 ```yaml
