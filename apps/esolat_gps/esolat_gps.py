@@ -1,7 +1,8 @@
 # Malaysia Prayer Time based on GPS Location using AppDaemon
-# Creation date: 18/02/2023; Modified date: 06/02/2024
-# Major Changes: Added 3 new attributes: Imsak, Isyraq and Dhuha.
-# Fixes: Handling on indexing for 1st of the month.
+# Creation date: 18/02/2023; Modified date: 03/10/2024
+# Fixes: 
+# - Handling on today timezone.
+# - Typo on Isyraq time.
 
 import appdaemon.plugins.hass.hassapi as hass
 import requests
@@ -44,7 +45,8 @@ class EsolatGPS(hass.Hass):
         self.update_prayer_time("sensor.esolat_home", "esolat_home", "Home Prayer Time", home_icon, home_latitude, home_longitude, "zone.home")
 
     def update_prayer_time(self, sensor_entity_id, sensor_unique_id, sensor_friendly_name, sensor_icon, latitude, longitude, prayer_entity_id):
-        today = datetime.now(timezone.utc).date()
+        #Fix by Salihin
+        today = datetime.now(pytz.timezone('Asia/Kuala_Lumpur')).date() 
         # Check if today is the first day of the month
         if today.day == 1:
             day_index = 0
@@ -85,8 +87,8 @@ class EsolatGPS(hass.Hass):
                         # Reference on Isyraq - https://zbrj.ml/waktuisyraq
                         isyraq_time = utc_prayer_time + timedelta(minutes=12) 
                         dhuha_time = utc_prayer_time + timedelta(minutes=15)
-                        isyraq_12h = self.convert_to_local_12time(iysraq_time.timestamp())
-                        isyraq_24h = self.convert_to_local_24time(iysraq_time.timestamp())
+                        isyraq_12h = self.convert_to_local_12time(isyraq_time.timestamp())
+                        isyraq_24h = self.convert_to_local_24time(isyraq_time.timestamp())
                         dhuha_12h = self.convert_to_local_12time(dhuha_time.timestamp())
                         dhuha_24h = self.convert_to_local_24time(dhuha_time.timestamp())
                         prayer_times["isyraq"] = isyraq_time.isoformat()
@@ -99,7 +101,7 @@ class EsolatGPS(hass.Hass):
                 self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=data["place"], attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "gps": f"{latitude},{longitude}", **prayer_times})
                 #self.log(f"*** Sensors updated for {sensor_friendly_name} ({data['place']})")
             except IndexError:
-                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {yesterday}. Index out of range.")
+                self.log(f"Error accessing prayer times for {sensor_friendly_name} on {day_index}. Index out of range.")
                 # Handle the error or set a default state
         else:
             self.set_state(sensor_entity_id, replace=True, unique_id=sensor_unique_id, state=f"unavailable", attributes={"icon": sensor_icon, "source": prayer_entity_id, "friendly_name": sensor_friendly_name, "location": f"ERROR CODE:{response.status_code}", "gps": f"{latitude},{longitude}"})
